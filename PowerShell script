@@ -1,0 +1,28 @@
+# Указываем параметры для отправки email
+$smtpServer = "smtp.gmail.com"               # SMTP-сервер Gmail
+$smtpPort = 587                              # Порт SMTP-сервера
+$from = "sultannurlanov3@gmail.com"          # Ваш email-адрес
+$password = "********"                    # Пароль вашего email (учтите безопасность!)
+$to = "sultannurlanov3@gmail.com, **********@gmail.com"  # Список получателей через запятую
+$subject = "Task Scheduler Notification"     # Тема письма
+$body = "This is a notification from Task Scheduler."  # Текст письма
+
+# Создаем объект для отправки email
+$message = New-Object System.Net.Mail.MailMessage
+$message.From = $from
+$message.To.Add($to)
+$message.Subject = $subject
+$message.Body = $body
+
+# Настраиваем SMTP-клиент
+$smtp = New-Object System.Net.Mail.SmtpClient($smtpServer, $smtpPort)
+$smtp.EnableSsl = $true
+$smtp.Credentials = New-Object System.Net.NetworkCredential($from, $password)
+
+# Отправляем письмо
+try {
+    $smtp.Send($message)
+    Write-Host "Email sent successfully."
+} catch {
+    Write-Host "Failed to send email: $_"
+}
