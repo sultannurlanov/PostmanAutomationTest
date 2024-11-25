@@ -1,0 +1,11 @@
+@echo off
+newman run TestNewman.json -d newman.json -r html 
+// newman run: This is the command to run tests with Newman.
+TestNewman.json: This is the Postman collection file that contains a set of API requests and tests.
+-d newman.json: This parameter specifies the data file (in this case, newman.json) that will be used for parameterizing the tests. It can contain various data sets for running multiple iterations of the tests.
+-r html: This parameter indicates that an HTML report should be generated after running the tests.
+In summary, this script runs tests from the TestNewman.json collection using data from the newman.json file and generates an HTML report.
+//newman run: Это команда для запуска тестов с помощью Newman.
+TestNewman.json: Это файл коллекции Postman, который содержит набор API-запросов и тестов.
+-d newman.json: Этот параметр указывает файл данных (в данном случае newman.json), который будет использоваться для параметризации тестов. Он может содержать различные наборы данных для выполнения нескольких итераций тестов.
+-r html: Этот параметр указывает на генерацию отчета в формате HTML после выполнения тестов.
