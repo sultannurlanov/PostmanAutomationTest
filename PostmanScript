@@ -1,0 +1,132 @@
+Payment
+// проверка статуса 200 
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+// проверка статуса 200 
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+//проверка на CONFIRMED
+pm.test("Response code is 120 - CONFIRMED", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.code).to.eql("120");
+}); 
+
+//проверка на PAYMENT_NOT_FOUND
+pm.test("Response code is 400 - PAYMENT_NOT_FOUND", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.code).to.eql("400");
+}); 
+
+//проверка на INCORRECT_ORDER_ID
+pm.test("Response code is 126 -INCORRECT_ORDER_ID", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.code).to.eql("126");
+}); 
+
+//проверка на TRANSACTION_ALREADY_CONFIRMED
+pm.test("Response code is 122 -TRANSACTION_ALREADY_CONFIRMED", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.code).to.eql("122");
+}); 
+
+//проверка на TRANSACTION_ALREADY_CONFIRMED
+pm.test("Response code is 123 -CONFIRMATION_TIMEOUT", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.code).to.eql("123");
+}); 
+
+pm.test("Response code is 126 -INSUFFICIENT_FUNDS", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.code).to.eql("126");
+}); 
+
+pm.test("Сохранить номер заказа", function () {
+    var jsonData = pm.response.json();
+    pm.environment.set("previousOrderNumber", jsonData.data.quid); 
+});
+
+// Telegram Bot Token и Chat ID
+const botToken = "*************"; 
+const chatId = "-*********"; 
+
+
+var jsonData = pm.response.json();
+
+// Проверка статуса ответа
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+// Уведомление при ошибке
+if (jsonData.code !== "110") { 
+    let errorMessage;
+
+    // Сообщение ошибки
+    switch (jsonData.code) {
+        case "112":
+            errorMessage = "DUPLICATED_ORDER_ID";
+            break;
+        case "126":
+            errorMessage = "INCORRECT_ORDER_ID";
+            break;
+        case "404":
+            errorMessage = "USER_NOT_FOUND";
+            break;
+        case "171":
+            errorMessage = "INCORRECT_SUM";
+            break;
+        case "140":
+            errorMessage = "INCORRECT_NUMBER_FORMAT";
+            break;
+        case "135":
+            errorMessage = "SERVICE_ERROR";
+            break;
+        case "220":
+            errorMessage = "TRANSACTION_LIMIT_EXCEEDED";
+            break;
+        default:
+            
+    }
+
+    const notificationMessage = `
+Postman -URL: https:
+Response: Payment
+HttpStatus -Response: ${pm.response.code}
+Code: ${jsonData.code} 
+Message: ${errorMessage}
+`;
+
+    console.log("Отправка уведомления в Telegram...");
+
+    //  уведомление в Telegram
+    pm.sendRequest({
+        url: `https://api.telegram.org/bot${botToken}/sendMessage`,
+        method: 'POST',
+        header: 'Content-Type: application/json',
+        body: {
+            mode: 'raw',
+            raw: JSON.stringify({
+                chat_id: chatId,
+                text: notificationMessage,
+                parse_mode: 'Markdown' 
+            })
+        }
+    }, function (err, res) {
+        if (err) {
+            console.error("Ошибка при отправке в Telegram: ", err);
+        } else {
+            console.log("Ответ Telegram API: ", res.json());
+            if (!res.json().ok) {
+                console.error("Ошибка при отправке сообщения:", res.json().description);
+            } else {
+                console.log("Сообщение успешно отправлено!");
+            }
+        }
+    });
+} else {
+    console.log("Запрос успешен и статус CREATED.");
+}
